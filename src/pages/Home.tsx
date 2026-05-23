@@ -1,0 +1,124 @@
+import { useEffect, useState } from "react";
+import {
+  Container,
+  Spinner,
+  Text,
+  Grid,
+  GridItem,
+  Box,
+} from "@chakra-ui/react";
+
+import Navbar from "../Component/Navbar";
+import { apiFetch } from "../api/client";
+import { useDebounce } from "../Hooks/debounce";
+
+import JobList from "../Component/JobList";
+import MatchList from "../Component/MatchList";
+import ScoreSlider from "../Component/ScoreSlider";
+import type { Job, MatchResult } from "../types";
+
+export default function Home() {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [results, setResults] = useState<MatchResult[]>([]);
+  const [minScore, setMinScore] = useState(0);
+  const [error, setError] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const debouncedScore = useDebounce(minScore, 400);
+
+  useEffect(() => {
+    apiFetch("/jobs").then(setJobs).catch(setError);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedJob) return;
+
+    const controller = new AbortController();
+    setLoading(true);
+
+    apiFetch("/match", {
+      method: "POST",
+      body: JSON.stringify({
+        jobId: selectedJob,
+        minScore: debouncedScore,
+      }),
+      signal: controller.signal,
+    })
+      .then(setResults)
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [selectedJob, debouncedScore]);
+
+  return (
+    <>
+      <Navbar />
+
+      <Container maxW="container.xl" p={0} height="100vh" overflow="hidden">
+        {error && (
+          <Box
+            p={4}
+            bg="red.100"
+            color="red.800"
+            borderRadius="md"
+            mx={4}
+            mt={2}
+          >
+            <Text fontWeight="bold">Something went wrong</Text>
+            <Text fontSize="sm">{error?.message || JSON.stringify(error)}</Text>
+          </Box>
+        )}
+        <Grid
+          templateColumns={{ base: "1fr", md: "1fr 2fr" }}
+          height="calc(100vh - 72px)"
+        >
+          <GridItem borderRightWidth="1px" overflowY="auto">
+            <Box p={4}>
+              <Text fontWeight="bold" fontSize="lg" mb={3}>
+                Jobs Loaded: {jobs.length}
+              </Text>
+
+              <JobList
+                jobs={jobs}
+                selectedJob={selectedJob}
+                onSelect={setSelectedJob}
+              />
+            </Box>
+          </GridItem>
+
+          <GridItem overflow="hidden">
+            <Box display="flex" flexDirection="column" height="100%">
+              <Box
+                p={6}
+                borderBottomWidth="1px"
+                bg="white"
+                position="sticky"
+                top={0}
+                zIndex={10}
+              >
+                {!selectedJob ? (
+                  <Text align="center" fontSize="lg">
+                    Select a job to see matches
+                  </Text>
+                ) : (
+                  <ScoreSlider value={minScore} onChange={setMinScore} />
+                )}
+              </Box>
+
+              <Box flex="1" overflowY="auto" p={6}>
+                {!selectedJob ? null : loading ? (
+                  <Spinner mt={4} />
+                ) : results.length === 0 ? (
+                  <Text mt={4}>No candidates found</Text>
+                ) : (
+                  <MatchList results={results} />
+                )}
+              </Box>
+            </Box>
+          </GridItem>
+        </Grid>
+      </Container>
+    </>
+  );
+}
