@@ -71,7 +71,6 @@ export default function CandidateForm({ onCreate }: any) {
   return (
     <Box p={4} borderWidth="1px" borderRadius="lg" mt={6}>
       <VStack spacing={3}>
-        {/* SUCCESS MESSAGE */}
         {successMsg && (
           <Box
             w="100%"
@@ -85,7 +84,6 @@ export default function CandidateForm({ onCreate }: any) {
           </Box>
         )}
 
-        {/* ERROR MESSAGE */}
         {submitError && (
           <Box
             w="100%"
@@ -99,7 +97,6 @@ export default function CandidateForm({ onCreate }: any) {
           </Box>
         )}
 
-        {/* NAME */}
         <FormControl isInvalid={!!errors.name}>
           <Input
             placeholder="Name"
@@ -109,7 +106,6 @@ export default function CandidateForm({ onCreate }: any) {
           <FormErrorMessage>{errors.name}</FormErrorMessage>
         </FormControl>
 
-        {/* SKILLS */}
         <FormControl isInvalid={!!errors.skills}>
           <Input
             placeholder="Skills (comma separated)"
@@ -119,7 +115,6 @@ export default function CandidateForm({ onCreate }: any) {
           <FormErrorMessage>{errors.skills}</FormErrorMessage>
         </FormControl>
 
-        {/* EXPERIENCE */}
         <FormControl isInvalid={!!errors.yearsExperience}>
           <Input
             placeholder="Years of Experience"
@@ -129,7 +124,6 @@ export default function CandidateForm({ onCreate }: any) {
           <FormErrorMessage>{errors.yearsExperience}</FormErrorMessage>
         </FormControl>
 
-        {/* LOCATION */}
         <FormControl isInvalid={!!errors.location}>
           <Input
             placeholder="Location (optional)"
@@ -139,7 +133,6 @@ export default function CandidateForm({ onCreate }: any) {
           <FormErrorMessage>{errors.location}</FormErrorMessage>
         </FormControl>
 
-        {/* BUTTON */}
         <Button
           colorScheme="teal"
           onClick={handleSubmit}

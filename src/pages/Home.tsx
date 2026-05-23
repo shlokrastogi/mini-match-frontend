@@ -15,7 +15,7 @@ import { useDebounce } from "../Hooks/debounce";
 import JobList from "../Component/JobList";
 import MatchList from "../Component/MatchList";
 import ScoreSlider from "../Component/ScoreSlider";
-import type { Job, MatchResult } from "../types";
+import type { Job, MatchResult } from "../utils/types";
 
 export default function Home() {
   const [jobs, setJobs] = useState<Job[]>([]);

@@ -1,4 +1,4 @@
-import type { Candidate } from "../types";
+import type { Candidate } from "./types";
 
 type CandidateInput = Omit<Candidate, "id">;
 
@@ -35,7 +35,7 @@ export function validateCandidate(data: CandidateInput): ValidationResult {
     errors.yearsExperience = "Experience looks unrealistic";
   }
 
-  // LOCATION (OPTIONAL — matches backend scoring logic)
+  // LOCATION
   if (data.location?.trim() === "") {
     errors.location = "Location cannot be empty if provided";
   }
