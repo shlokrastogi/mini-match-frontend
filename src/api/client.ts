@@ -1,4 +1,4 @@
-import { BASE_URL } from "../constants.ts";
+import { BASE_URL } from "../utils/constants";
 
 export async function apiFetch(endpoint: string, options?: RequestInit) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
