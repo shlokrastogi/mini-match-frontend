@@ -37,7 +37,7 @@ export default function JobList({ jobs, selectedJob, onSelect }: Props) {
               </Text>
 
               <Text fontSize="sm" color="gray.600">
-                Experience: {job.minExperience || "N/A"} yrs
+                Experience: {job.minYearsExperience || "N/A"} yrs
               </Text>
 
               <Text fontSize="sm" color="gray.600">

@@ -2,7 +2,7 @@ export type Job = {
   id: string;
   title: string;
   requiredSkills: string[];
-  minExperience: number;
+  minYearsExperience: number;
   location?: string;
 };
 
