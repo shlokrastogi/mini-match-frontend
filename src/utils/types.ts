@@ -23,3 +23,10 @@ export type MatchResult = {
     location: number;
   };
 };
+
+export type CandidateInput = {
+  name: string;
+  skills: string[];
+  yearsExperience: number;
+  location?: string;
+};

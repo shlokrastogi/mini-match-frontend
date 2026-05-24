@@ -1,6 +1,10 @@
 import { BASE_URL } from "../utils/constants";
+import type { Candidate, CandidateInput } from "../utils/types";
 
-export async function apiFetch(endpoint: string, options?: RequestInit) {
+export async function apiFetch<T>(
+  endpoint: string,
+  options?: RequestInit,
+): Promise<T> {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
@@ -8,17 +12,19 @@ export async function apiFetch(endpoint: string, options?: RequestInit) {
     ...options,
   });
 
-  const data = await res.json();
+  const data: unknown = await res.json();
 
   if (!res.ok) {
     throw data;
   }
 
-  return data;
+  return data as T;
 }
 
-export async function createCandidate(data: any) {
-  return apiFetch("/candidates", {
+export async function createCandidate(
+  data: CandidateInput,
+): Promise<Candidate> {
+  return apiFetch<Candidate>("/candidates", {
     method: "POST",
     body: JSON.stringify(data),
   });

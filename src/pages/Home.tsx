@@ -22,13 +22,13 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [minScore, setMinScore] = useState(0);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
 
   const debouncedScore = useDebounce(minScore, 400);
 
   useEffect(() => {
-    apiFetch("/jobs").then(setJobs).catch(setError);
+    apiFetch<Job[]>("/jobs").then(setJobs).catch(setError);
   }, []);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function Home() {
     const controller = new AbortController();
     setLoading(true);
 
-    apiFetch("/match", {
+    apiFetch<MatchResult[]>("/match", {
       method: "POST",
       body: JSON.stringify({
         jobId: selectedJob,
@@ -56,19 +56,9 @@ export default function Home() {
       <Navbar />
 
       <Container maxW="container.xl" p={0} height="100vh" overflow="hidden">
-        {error && (
-          <Box
-            p={4}
-            bg="red.100"
-            color="red.800"
-            borderRadius="md"
-            mx={4}
-            mt={2}
-          >
-            <Text fontWeight="bold">Something went wrong</Text>
-            <Text fontSize="sm">{error?.message || JSON.stringify(error)}</Text>
-          </Box>
-        )}
+        <Text fontSize="sm">
+          {error instanceof Error ? error.message : JSON.stringify(error)}
+        </Text>
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 2fr" }}
           height="calc(100vh - 72px)"
