@@ -17,7 +17,7 @@ export default function Navbar() {
         Mini Match
       </Heading>
 
-      <Button colorScheme="teal" onClick={() => navigate("/candidate")}>
+      <Button colorScheme="teal" onClick={() => navigate("/candidate/new")}>
         Register Candidate
       </Button>
     </Flex>
