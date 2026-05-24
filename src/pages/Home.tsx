@@ -1,3 +1,5 @@
+import { JobsResponseSchema } from "../utils/schemas/JobSchema.ts";
+import { MatchResponseSchema } from "../utils/schemas/MatchSchema.ts";
 import { useEffect, useState } from "react";
 import {
   Container,
@@ -22,13 +24,26 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
   const [minScore, setMinScore] = useState(0);
-  const [error, setError] = useState<unknown>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const debouncedScore = useDebounce(minScore, 400);
 
   useEffect(() => {
-    apiFetch<Job[]>("/jobs").then(setJobs).catch(setError);
+    apiFetch("/jobs")
+      .then((data) => {
+        const parsed = JobsResponseSchema.parse(data);
+        setJobs(parsed);
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else if (typeof err === "object" && err !== null) {
+          setError(JSON.stringify(err));
+        } else {
+          setError("Something went wrong");
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -37,7 +52,7 @@ export default function Home() {
     const controller = new AbortController();
     setLoading(true);
 
-    apiFetch<MatchResult[]>("/match", {
+    apiFetch("/match", {
       method: "POST",
       body: JSON.stringify({
         jobId: selectedJob,
@@ -45,7 +60,19 @@ export default function Home() {
       }),
       signal: controller.signal,
     })
-      .then(setResults)
+      .then((data) => {
+        const parsed = MatchResponseSchema.parse(data);
+        setResults(parsed);
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else if (typeof err === "object" && err !== null) {
+          setError(JSON.stringify(err));
+        } else {
+          setError("Something went wrong");
+        }
+      })
       .finally(() => setLoading(false));
 
     return () => controller.abort();
@@ -56,9 +83,11 @@ export default function Home() {
       <Navbar />
 
       <Container maxW="container.xl" p={0} height="100vh" overflow="hidden">
-        <Text fontSize="sm">
-          {error instanceof Error ? error.message : JSON.stringify(error)}
-        </Text>
+        {error && (
+          <Text fontSize="sm" color="red.500">
+            {typeof error === "string" ? error : JSON.stringify(error)}
+          </Text>
+        )}
         <Grid
           templateColumns={{ base: "1fr", md: "1fr 2fr" }}
           height="calc(100vh - 72px)"
